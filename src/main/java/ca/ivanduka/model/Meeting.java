@@ -11,18 +11,18 @@ public class Meeting {
     private String location;
     private int durationInMinutes;
     private String details;
-    private User organizer;
+    private UUID organizerID;
     private List<TimeAndDate> timeAndDates;
     private List<User> attendees;
     private List<Message> messages;
 
     // Creating a new Meeting
-    public Meeting(String name, String location, int durationInMinutes, String details, User organizer) {
+    public Meeting(String name, String location, int durationInMinutes, String details, UUID organizerID) {
         this.name = name;
         this.location = location;
         this.durationInMinutes = durationInMinutes;
         this.details = details;
-        this.organizer = organizer;
+        this.organizerID = organizerID;
         this.meetingID = UUID.randomUUID();
         this.timeAndDates = new ArrayList<>();
         this.attendees = new ArrayList<>();
@@ -31,13 +31,13 @@ public class Meeting {
 
     // Meeting from a DB
     public Meeting(UUID meetingID, String name, String location, int durationInMinutes, String details,
-                   User organizer, List<TimeAndDate> timeAndDates, List<User> attendees, List<Message> messages) {
+                   UUID organizerID, List<TimeAndDate> timeAndDates, List<User> attendees, List<Message> messages) {
         this.meetingID = meetingID;
         this.name = name;
         this.location = location;
         this.durationInMinutes = durationInMinutes;
         this.details = details;
-        this.organizer = organizer;
+        this.organizerID = organizerID;
         this.timeAndDates = timeAndDates;
         this.attendees = attendees;
         this.messages = messages;
@@ -67,7 +67,7 @@ public class Meeting {
                 ", \n\ttimeAndDates=" + timeAndDates +
                 ", \n\tattendees=" + attendees +
                 ", \n\tmessages=" + messages +
-                ", \n\torganizer=" + organizer +
+                ", \n\torganizerID=" + organizerID +
                 "\n}";
     }
 
@@ -103,8 +103,8 @@ public class Meeting {
         this.details = details;
     }
 
-    public User getOrganizer() {
-        return organizer;
+    public UUID getOrganizerID() {
+        return organizerID;
     }
 
     public List<TimeAndDate> getTimeAndDates() {

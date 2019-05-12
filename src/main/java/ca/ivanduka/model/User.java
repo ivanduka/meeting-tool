@@ -66,6 +66,8 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", zoneOffset=" + zoneOffset +
+                ", meetings=" + meetings +
                 '}';
     }
 
