@@ -37,13 +37,10 @@ public class MeetingDB {
     List<Meeting> getAllByUserID(UUID userID) {
         List<Meeting> meetings = new ArrayList<>();
 
-        ResultSet res = null;
-
-        try {
-            res = dataSource
-                    .getConnection()
-                    .createStatement()
-                    .executeQuery("SELECT * FROM meetings WHERE organizerID = '" + userID + "'");
+        try (ResultSet res = dataSource
+                .getConnection()
+                .createStatement()
+                .executeQuery("SELECT * FROM meetings WHERE organizerID = '" + userID + "'")) {
 
             while (res.next()) {
                 UUID meetingID = UUID.fromString(res.getString("ID"));
@@ -65,8 +62,6 @@ public class MeetingDB {
 
         } catch (Exception e) {
             System.out.println("WTF?!\n" + e);
-        } finally {
-            Utils.close(res);
         }
 
         return meetings;

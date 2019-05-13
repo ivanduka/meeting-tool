@@ -14,7 +14,6 @@ public class User {
     private String email;
     private String password;
     private ZoneOffset zoneOffset;
-    private List<Meeting> meetings;
 
     // New user registration
     public User(String firstName, String lastName, String email, String password) {
@@ -26,12 +25,11 @@ public class User {
         this.userType = UserTypes.USER;
         this.userStatus = UserStatuses.NOT_CONFIRMED;
         this.zoneOffset = ZoneOffset.of("+00:00");
-        this.meetings = new ArrayList<>();
     }
 
     // User from a DB
     public User(UUID userID, UserTypes userType, String firstName, String lastName, String email,
-                String password, UserStatuses userStatus, ZoneOffset zoneOffset, List<Meeting> meetings) {
+                String password, UserStatuses userStatus, ZoneOffset zoneOffset) {
         this.userID = userID;
         this.userType = userType;
         this.firstName = firstName;
@@ -40,7 +38,6 @@ public class User {
         this.password = password;
         this.userStatus = userStatus;
         this.zoneOffset = zoneOffset;
-        this.meetings = meetings;
     }
 
     @Override
@@ -67,7 +64,6 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", zoneOffset=" + zoneOffset +
-                ", meetings=" + meetings +
                 '}';
     }
 
@@ -129,9 +125,5 @@ public class User {
 
     public void setZoneOffset(ZoneOffset zoneOffset) {
         this.zoneOffset = zoneOffset;
-    }
-
-    public List<Meeting> getMeetings() {
-        return meetings;
     }
 }
