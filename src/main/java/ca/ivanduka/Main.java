@@ -5,9 +5,7 @@ import ca.ivanduka.repository.*;
 import com.mysql.cj.jdbc.MysqlDataSource;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,10 +24,16 @@ public class Main {
             User newUser = new User("User " + LocalDateTime.now().getSecond(), "User " +
                     LocalDateTime.now().getSecond(), "john@winterfell.com " + LocalDateTime.now().getSecond(),
                     "qwerty");
+
+
             userDB.save(newUser);
 
-            User user2 = userDB.getOne(UUID.fromString("b57fdce4-7341-11e9-b34c-3534645992cf"));
-            user2.setUserStatus(UserStatuses.NOT_CONFIRMED);
+            User user2 = userDB.getOne("ivan.duka@ukr.net");
+            if (user2.getUserStatus().equals(UserStatuses.NOT_CONFIRMED)) {
+                user2.setUserStatus(UserStatuses.CONFIRMED);
+            } else {
+                user2.setUserStatus(UserStatuses.NOT_CONFIRMED);
+            }
             userDB.update(user2);
 
             System.out.println();
@@ -37,20 +41,8 @@ public class Main {
             for (var user : users) System.out.println(user);
 
             userDB.delete(newUser.getUserID());
-
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
-
-//        class Test {
-//            void print(String string) {
-//                this.<String>print(string);
-//            }
-//
-//            <T> void print(T object) {
-//                System.out.println(object.toString());
-//            }
-//        }
-
     }
 }

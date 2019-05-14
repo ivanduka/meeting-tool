@@ -3,6 +3,7 @@ package ca.ivanduka.repository;
 import ca.ivanduka.model.*;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.ZoneOffset;
@@ -18,68 +19,51 @@ public class UserDB {
         this.dataSource = dataSource;
     }
 
-    public void save(User user) throws Exception {
-
-        try (PreparedStatement ps = this.dataSource
-                .getConnection()
-                .prepareStatement("INSERT INTO users values (?, ?, ?, ?, ?, ?, ?, ?)")) {
+    public void save(User user) {
+        try (Connection conn = this.dataSource.getConnection();
+             PreparedStatement ps = conn
+                     .prepareStatement("INSERT INTO users(firstName, lastName, email, password, userType, " +
+                             "userStatus, zoneOffset, ID) values (?, ?, ?, ?, ?, ?, ?, ?)")) {
             setUserParams(ps, user);
-            ps.execute();
+            ps.executeUpdate();
+            if (ps.getUpdateCount() == 0) throw new Exception(user.getUserID() + " was not saved");
         } catch (Exception e) {
-            throw new Exception("User " + user.getEmail() + " could not be inserted");
+            e.printStackTrace();
         }
     }
 
-    public void update(User user) throws Exception {
-
+    public void update(User user) {
         try (PreparedStatement ps = this.dataSource
                 .getConnection()
-                .prepareStatement("UPDATE users SET ID = ?, userType = ?, userStatus = ?, firstName = ?, " +
-                        "lastName = ?, email = ?,  password = ?,   zoneOffset = ? WHERE ID = ?")) {
-
+                .prepareStatement("UPDATE users SET firstName = ?, lastName = ?, email = ?, password = ?, " +
+                        "userType = ?, userStatus = ?, zoneOffset = ? WHERE ID = ?")) {
             setUserParams(ps, user);
-            ps.setString(9, user.getUserID().toString());
-            ps.execute();
+            ps.executeUpdate();
+            if (ps.getUpdateCount() == 0) throw new Exception(user.getUserID() + " was not updated");
         } catch (Exception e) {
-            throw new Exception("User " + user.getEmail() + " could not be inserted");
+            e.printStackTrace();
         }
     }
 
-//    public User getOne(String email) throws Exception { // FIXME
-//        return UserDB.this.<>getOne(email);
-//    }
-
-    public <T> User getOne(T object) throws Exception {
-        PreparedStatement ps = null;
+    public User getOne(String email) {
         User user = null;
 
-        try {
-            if (object instanceof UUID) {
-                ps = this.dataSource
-                        .getConnection()
-                        .prepareStatement("SELECT * FROM users WHERE ID = ?");
-            } else if (object instanceof String) {
-                ps = this.dataSource
-                        .getConnection()
-                        .prepareStatement("SELECT * FROM users WHERE email = ?");
-            }
+        try (PreparedStatement ps = this.dataSource
+                .getConnection()
+                .prepareStatement("SELECT * FROM users WHERE email = ?")) {
+            ps.setString(1, email);
 
-            if (ps != null) {
-                ps.setString(1, object.toString());
-                ResultSet res = ps.executeQuery();
-                res.next();
-                user = readUser(res);
-            }
+            ResultSet res = ps.executeQuery();
+            res.next();
+            user = readUser(res);
         } catch (Exception e) {
-            throw new Exception("User " + object.toString() + " not found");
-        } finally {
-            if (ps != null) ps.close();
+            e.printStackTrace();
         }
 
         return user;
     }
 
-    public List<User> getAll() throws Exception {
+    public List<User> getAll() {
         List<User> users = new ArrayList<>();
 
         try (PreparedStatement ps = this.dataSource
@@ -91,23 +75,22 @@ public class UserDB {
                 users.add(readUser(res));
             }
         } catch (Exception e) {
-            throw new Exception("Error retrieving all users form the DB");
+            e.printStackTrace();
         }
 
         return users;
     }
 
 
-    public void delete(UUID userID) throws Exception {
-
+    public void delete(UUID userID) {
         try (PreparedStatement ps = this.dataSource
                 .getConnection()
                 .prepareStatement("DELETE FROM users WHERE ID = ?")) {
-
             ps.setString(1, userID.toString());
-            ps.execute();
+            ps.executeUpdate();
+            if (ps.getUpdateCount() == 0) throw new Exception(userID + " was not deleted");
         } catch (Exception e) {
-            throw new Exception("User " + userID + " could not be deleted");
+            e.printStackTrace();
         }
     }
 
@@ -126,13 +109,13 @@ public class UserDB {
     }
 
     private void setUserParams(PreparedStatement ps, User user) throws Exception {
-        ps.setString(1, user.getUserID().toString());
-        ps.setString(2, user.getUserType().toString());
-        ps.setString(3, user.getUserStatus().toString());
-        ps.setString(4, user.getFirstName());
-        ps.setString(5, user.getLastName());
-        ps.setString(6, user.getEmail());
-        ps.setString(7, user.getPassword());
-        ps.setString(8, user.getZoneOffset().toString());
+        ps.setString(1, user.getFirstName());
+        ps.setString(2, user.getLastName());
+        ps.setString(3, user.getEmail());
+        ps.setString(4, user.getPassword());
+        ps.setString(5, user.getUserType().toString());
+        ps.setString(6, user.getUserStatus().toString());
+        ps.setString(7, user.getZoneOffset().toString());
+        ps.setString(8, user.getUserID().toString());
     }
 }
